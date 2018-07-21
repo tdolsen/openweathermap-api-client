@@ -1,0 +1,48 @@
+{
+	"name": "openweathermap-api-client",
+	"version": "1.0.0",
+	"description": "Promise based API client for getting weather data and forecasts from openweathermap.org",
+	"author": "Torkild Dyvik Olsen",
+	"license": "MIT",
+	"homepage": "https://github.com/tdolsen/openweathermap-api-client",
+	"repository": "github:tdolsen/openweathermap-api-client",
+	"bugs": "https://github.com/tdolsen/openweathermap-api-client/issues",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"scripts": {
+		"clean": "del dist",
+		"compile": "tsc",
+		"lint:format:fix": "prettier --write",
+		"commit": "git-cz",
+		"commit:retry": "git-cz --retry",
+		"prerelease": "pkg-ok",
+		"release": "semantic-release"
+	},
+	"config": {
+		"commitizen": {
+			"path": "@commitlint/prompt"
+		}
+	},
+	"dependencies": {
+		"axios": "^0.18.0",
+		"query-string": "^6.1.0"
+	},
+	"devDependencies": {
+		"@commitlint/cli": "^7.0.0",
+		"@commitlint/config-conventional": "^7.0.1",
+		"@commitlint/prompt": "^7.0.0",
+		"@semantic-release/changelog": "^3.0.0",
+		"@semantic-release/git": "^7.0.1",
+		"@semantic-release/github": "^5.0.1",
+		"@semantic-release/npm": "^4.0.0",
+		"@types/query-string": "^6.1.0",
+		"commitizen": "^2.10.1",
+		"del": "^3.0.0",
+		"husky": "^1.0.0-rc.13",
+		"lint-staged": "^7.2.0",
+		"pkg-ok": "^2.2.0",
+		"prettier": "^1.13.7",
+		"semantic-release": "^15.8.1",
+		"typescript": "^2.9.2"
+	}
+}
