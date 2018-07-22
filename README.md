@@ -1,5 +1,7 @@
 # OpenWeatherMap API client
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/tdolsen/openweathermap-api-client.svg)](https://greenkeeper.io/)
+
 > Promise based API client for getting weather data and forecasts from
 > openweathermap.org
 
