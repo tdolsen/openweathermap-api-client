@@ -15,11 +15,10 @@
 		]
 	},
 
-	// "@semantic-release/release-notes-generator"
 	"generateNotes": {
 		"preset": "angular",
 		"parserOpts": {
-			"mergePattern": '/^Merge pull request #(\d+) from (.*)$/',
+			"mergePattern": "/^Merge pull request #(\\d+) from (.*)$/",
 			"mergeCorrespondence": ["id", "source"],
 			"noteKeywords": ["BREAKING CHANGE", "BREAKING CHANGES"]
 		}
@@ -41,7 +40,7 @@
 				"README.md", "CHANGELOG.md", "package.json", "package-lock.json", "npm-shrinkwrap.json",
 				"dist/**/*"
 			],
-			"message": "chore(release): ${----------------------------"
+			"message": ":tada: Release <%= nextRelease.version %> - <%= new Date().toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' }) %> [skip ci]\n\n<%= nextRelease.notes %>"
 		}
 	],
 	"publish": [

@@ -1,4 +1,4 @@
-# OpenWeatherMap API client
+# [OpenWeatherMap][OWM] API client
 
 > Promise based API client for getting weather data and forecasts from
 > openweathermap.org
@@ -76,3 +76,5 @@ async function getWeatherData() {
 // Start the API calls.
 void getWeatherData();
 ```
+
+[OWM]:https://openweathermap.org/
