@@ -1,0 +1,25 @@
+language: node_js
+cache:
+  yarn: true
+  directories:
+    - node_modules
+    - ~/.npm
+notifications:
+  email: false
+node_js:
+  - '8'
+before_install:
+  - openssl aes-256-cbc -K $encrypted_56df3f79cf05_key -iv $encrypted_56df3f79cf05_iv -in git_deploy_key.enc -out git_deploy_key -d
+  - chmod 600 /tmp/git_deploy_key
+  - echo 'echo ${SSH_PASSPHRASE}' > /tmp/askpass && chmod +x /tmp/askpass
+  - eval "$(ssh-agent -s)"
+  - DISPLAY=":0.0" SSH_ASKPASS="/tmp/askpass" setsid ssh-add /tmp/git_deploy_key </dev/null
+after_success:
+deploy:
+  provider: script
+  skip_cleanup: true
+  script:
+    - yarn run travis-deploy-once "yarn run semantic-release"
+branches:
+  except:
+    - /^v\d+\.\d+\.\d+$/

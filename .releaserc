@@ -1,0 +1,62 @@
+{
+	"branch": "master",
+	"tarballDir": "dist",
+	"assets": "dist/*.tgz",
+
+	"analyzeCommits": {
+		"preset": "angular",
+		"releaseRules": [
+			{ "type": "feat", "release": "minor" },
+			{ "type": "fix", "release": "patch" },
+			{ "type": "perf", "release": "patch" },
+			{ "type": "build", "release": "patch" },
+			{ "type": "docs", "release": "patch" },
+			{ "type": "revert", "release": "patch" }
+		]
+	},
+
+	// "@semantic-release/release-notes-generator"
+	"generateNotes": {
+		"preset": "angular",
+		"parserOpts": {
+			"mergePattern": '/^Merge pull request #(\d+) from (.*)$/',
+			"mergeCorrespondence": ["id", "source"],
+			"noteKeywords": ["BREAKING CHANGE", "BREAKING CHANGES"]
+		}
+	},
+
+	"verifyConditions": [
+		"@semantic-release/changelog",
+		"@semantic-release/npm",
+		"@semantic-release/git",
+		"@semantic-release/github"
+	],
+	"verifyRelease": [],
+	"prepare": [
+		"@semantic-release/changelog",
+		"@semantic-release/npm",
+		{
+			"path": "@semantic-release/git",
+			"assets": [
+				"README.md", "CHANGELOG.md", "package.json", "package-lock.json", "npm-shrinkwrap.json",
+				"dist/**/*"
+			],
+			"message": "chore(release): ${----------------------------"
+		}
+	],
+	"publish": [
+		"@semantic-release/npm",
+		{
+			"path": "@semantic-release/github",
+			"assets": [
+				["dist/**/*.{js,d.ts}", "!**/*.min.*"]
+			]
+		}
+	],
+	"success": [
+		"@semantic-release/github"
+	],
+	"fail": [
+		"@semantic-release/github"
+	]
+}
