@@ -1,85 +1,151 @@
 import axios, { AxiosInstance, AxiosResponse } from "axios";
 import qs from "query-string";
 
-import { ApiResponse, Endpoint, ForecastResponse, Options, Units, WeatherResponse } from "./interfaces";
-import { isEndpoint } from "./utils";
+import { Coord, CountryCode, Endpoint, Language, Options, RequestQuery, Response, Units } from "./interfaces";
+import { isEndpoint, isCoord, isRequestQuery, isCountryCode } from "./utils";
 import { ApiException } from "./api-exception";
 
 const DEFAULT_API_URL = "https://api.openweathermap.org/data/2.5";
+const DEFAULT_ENDPOINT: Endpoint = Endpoint.Weather;
+const DEFAULT_LANGUAGE: Language = "en";
+const DEFAULT_UNITS: Units = "standard";
 
-export class OpenWeatherMapApiClient {
-	apiKey: string;
+const DEFAULT_OPTIONS: NonNullable<Pick<Options, "apiUrl" | "endpoint" | "lang" | "units">> = {
+	apiUrl: DEFAULT_API_URL,
+	endpoint: DEFAULT_ENDPOINT,
+	lang: DEFAULT_LANGUAGE,
+	units: DEFAULT_UNITS,
+};
+
+export class ApiClient {
 	axios: AxiosInstance;
-	units: Units;
+	options: Options;
 
 	constructor(options: string | Options) {
 		if (typeof options === "string") options = { apiKey: options };
 
-		this.apiKey = options.apiKey;
-		this.units = options.units || "standard";
+		this.options = {
+			...DEFAULT_OPTIONS,
+			...options,
+		};
+
+		if (!("apiKey" in this.options)) {
+			throw new Error("An API key (APPID) has to be set in order to use the API client.");
+		}
+
 		this.axios =
-			options.axios ||
+			this.options.axios ||
 			axios.create({
-				baseURL: options.apiUrl || DEFAULT_API_URL,
+				baseURL: this.options.apiUrl,
 			});
 	}
 
-	async getByCityId(id: number): Promise<WeatherResponse>;
-	async getByCityId(id: number, endpoint: "weather"): Promise<WeatherResponse>;
-	async getByCityId(id: number, endpoint: "forecast"): Promise<ForecastResponse>;
-	async getByCityId(id: number, endpoint?: Endpoint): Promise<ApiResponse> {
-		return this.request(endpoint, { id });
+	// Returns the current weather for given query.
+	async current(query: number | string | Coord | RequestQuery<Endpoint.Weather>) {
+		return this.request("weather", this._prepQuery(query));
 	}
 
-	async getByCityName(cityName: string): Promise<WeatherResponse>;
-	async getByCityName(cityName: string, endpoint: "weather"): Promise<WeatherResponse>;
-	async getByCityName(cityName: string, endpoint: "forecast"): Promise<ForecastResponse>;
-	async getByCityName(cityName: string, country: string): Promise<WeatherResponse>;
-	async getByCityName(cityName: string, country: string, endpoint: "weather"): Promise<WeatherResponse>;
-	async getByCityName(cityName: string, country: string, endpoint: "forecast"): Promise<ForecastResponse>;
-	async getByCityName(cityName: string, country?: string | Endpoint, endpoint?: Endpoint): Promise<ApiResponse> {
-		if (isEndpoint(country)) {
-			endpoint = country;
-			country = undefined;
-		}
-
-		const q = `${cityName}${country ? `,${country}` : ""}`;
-
-		return this.request(endpoint, { q });
+	// Alias to `.current()`.
+	async weather(query: number | string | Coord | RequestQuery<Endpoint.Weather>) {
+		return this.current(query);
 	}
 
-	async getByCoordinates(lat: number, lon: number): Promise<WeatherResponse>;
-	async getByCoordinates(lat: number, lon: number, endpoint: "weather"): Promise<WeatherResponse>;
-	async getByCoordinates(lat: number, lon: number, endpoint: "forecast"): Promise<ForecastResponse>;
-	async getByCoordinates(lat: number, lon: number, endpoint?: Endpoint): Promise<ApiResponse> {
-		return this.request(endpoint, { lat, lon });
+	// Returns forecast for given query.
+	async forecast(query: number | string | Coord | RequestQuery<Endpoint.Forecast>) {
+		return this.request("forecast", this._prepQuery(query));
 	}
 
-	async getByZip(zip: number | string): Promise<WeatherResponse>;
-	async getByZip(zip: number | string, endpoint: "weather"): Promise<WeatherResponse>;
-	async getByZip(zip: number | string, endpoint: "forecast"): Promise<ForecastResponse>;
-	async getByZip(zip: number | string, country: string): Promise<WeatherResponse>;
-	async getByZip(zip: number | string, country: string, endpoint: "weather"): Promise<WeatherResponse>;
-	async getByZip(zip: number | string, country: string, endpoint: "forecast"): Promise<ForecastResponse>;
-	async getByZip(zip: number | string, country?: string | Endpoint, endpoint?: Endpoint): Promise<ApiResponse> {
-		if (isEndpoint(country)) {
-			endpoint = country;
-			country = undefined;
-		}
+	// Returns weather or forcast for city with given `id`.
+	async getByCityId<T extends Endpoint>(id: number, endpoint?: T): Promise<Response<T>> {
+		return this.request<T>({ endpoint, id });
+	}
+
+	// Returns weather or forecast for city with given `name` and optionally `country`.
+	async getByCityName<T extends Endpoint>(name: string, endpoint?: T): Promise<Response<T>>;
+	async getByCityName<T extends Endpoint>(name: string, country: CountryCode, endpoint?: T): Promise<Response<T>>;
+	async getByCityName<T extends Endpoint>(
+		name: string,
+		countryOrEndpoint?: CountryCode | T,
+		maybeEndpoint?: T
+	): Promise<Response<T>> {
+		const endpoint: T | undefined = isEndpoint(countryOrEndpoint)
+			? countryOrEndpoint
+			: isEndpoint(maybeEndpoint)
+				? maybeEndpoint
+				: undefined;
+
+		const country: CountryCode | undefined = isCountryCode(countryOrEndpoint) ? countryOrEndpoint : undefined;
+
+		const q = `${name}${country ? `,${country}` : ""}`;
+
+		return this.request<T>({ endpoint, q });
+	}
+
+	// Returns weather or forecast at coordinates `lat`/`lon`.
+	async getByCoordinates<T extends Endpoint>(lat: number, lon: number, endpoint?: T): Promise<Response<T>> {
+		return this.request<T>({ endpoint, lat, lon });
+	}
+
+	// Returns weather or forcast for `zip` area with optional `country` (defaults
+	// to "us" if none provided).
+	async getByZip<T extends Endpoint>(zip: number | string, endpoint?: T): Promise<Response<T>>;
+	async getByZip<T extends Endpoint>(zip: number | string, country: CountryCode, endpoint?: T): Promise<Response<T>>;
+	async getByZip<T extends Endpoint>(
+		zip: number | string,
+		countryOrEndpoint?: CountryCode | T,
+		maybeEndpoint?: T
+	): Promise<Response<T>> {
+		const endpoint: T | undefined = isEndpoint(countryOrEndpoint)
+			? countryOrEndpoint
+			: isEndpoint(maybeEndpoint)
+				? maybeEndpoint
+				: undefined;
+
+		const country: CountryCode | undefined = isCountryCode(countryOrEndpoint) ? countryOrEndpoint : undefined;
 
 		zip = `${zip.toString()}${country ? `,${country}` : ""}`;
 
-		return this.request(endpoint, { zip });
+		return this.request<T>({ endpoint, zip });
 	}
 
-	async request(endpoint = "weather", query = {}) {
+	// Returns weather or forecast for given `query`.
+	async request<T extends Endpoint>(query: RequestQuery<T | undefined>): Promise<Response<T>>;
+	async request<T extends Endpoint>(endpoint: T | undefined, query: RequestQuery<any>): Promise<Response<T>>;
+	async request<T extends Endpoint>(
+		queryOrEndpoint: RequestQuery<T | undefined> | T | undefined,
+		maybeQuery?: RequestQuery<T | undefined>
+	): Promise<Response<T>> {
+		const query: RequestQuery<T> | undefined = isRequestQuery(maybeQuery)
+			? maybeQuery
+			: isRequestQuery(queryOrEndpoint)
+				? queryOrEndpoint
+				: undefined;
+
+		if (!isRequestQuery(query)) {
+			throw new Error("A proper request query must be provided to in order to make a request.");
+		}
+
+		const endpoint: T | undefined = isEndpoint(queryOrEndpoint)
+			? queryOrEndpoint
+			: isEndpoint(query.endpoint)
+				? query.endpoint
+				: isEndpoint(this.options.endpoint)
+					? (this.options.endpoint as T)
+					: undefined;
+
+		if (!isEndpoint(endpoint)) {
+			throw new Error(`A endpoint ("weather" or "forecast") must be defined in order to make a request.`);
+		}
+
 		const queryString = qs.stringify({
-			APPID: this.apiKey,
-			units: (this.units !== "standard" && this.units) || undefined,
+			APPID: this.options.apiKey,
+			units: this.options.units,
+			lang: this.options.lang,
+
 			...query,
 		});
 
-		let res: AxiosResponse;
+		let res: AxiosResponse<Response<T>>;
 
 		try {
 			res = await this.axios.get(`${endpoint}?${queryString}`);
@@ -97,5 +163,18 @@ export class OpenWeatherMapApiClient {
 		}
 
 		return res.data;
+	}
+
+	// Preps `query` param for `.current()` and `.forecast()`, assuming `number`
+	// represents a city ID, `string` represents city name and `Coord` represents
+	// lat/lon coordiantes. If `query` is a valid `RequestQuery` object will use
+	// that. Throws an error if no valid type was identified.
+	protected _prepQuery(query: number | string | Coord | RequestQuery<Endpoint | undefined>) {
+		if (typeof query === "number") query = { id: query };
+		else if (typeof query === "string") query = { q: query };
+		else if (isCoord(query) || isRequestQuery(query)) query = { ...query };
+		else throw new Error("Invalid value passed as request query.");
+
+		return query as RequestQuery<Endpoint | undefined>;
 	}
 }

@@ -1,6 +1,6 @@
 export class ApiException extends Error {
-	constructor(message: string) {
+	constructor(message?: string) {
 		super(message);
-		Object.setPrototypeOf(this, ApiException.prototype);
+		Object.setPrototypeOf(this, new.target.prototype);
 	}
 }
