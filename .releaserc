@@ -1,7 +1,5 @@
 {
 	"branch": "master",
-	"tarballDir": "dist",
-	"assets": "dist/*.tgz",
 
 	"analyzeCommits": {
 		"preset": "angular",
@@ -37,10 +35,8 @@
 		{
 			"path": "@semantic-release/git",
 			"assets": [
-				"README.md", "CHANGELOG.md", "package.json", "package-lock.json", "npm-shrinkwrap.json",
-				"dist/**/*"
-			],
-			"message": ":tada: Release <%= nextRelease.version %> - <%= new Date().toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' }) %> [skip ci]\n\n<%= nextRelease.notes %>"
+				"README.md", "CHANGELOG.md", "package.json", "package-lock.json", "npm-shrinkwrap.json", "yarn.lock"
+			]
 		}
 	],
 	"publish": [
