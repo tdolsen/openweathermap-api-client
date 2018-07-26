@@ -1,7 +1,18 @@
 import axios, { AxiosInstance, AxiosResponse } from "axios";
 import qs from "query-string";
 
-import { Coord, CountryCode, Endpoint, Language, Options, RequestQuery, Response, Units } from "./interfaces";
+import {
+	Coord,
+	CountryCode,
+	Endpoint,
+	ForecastResponse,
+	Language,
+	Options,
+	RequestQuery,
+	Response,
+	Units,
+	WeatherResponse,
+} from "./interfaces";
 import { isEndpoint, isCoord, isRequestQuery, isCountryCode } from "./utils";
 import { ApiException } from "./api-exception";
 
@@ -41,7 +52,7 @@ export class ApiClient {
 	}
 
 	// Returns the current weather for given query.
-	async current(query: number | string | Coord | RequestQuery<Endpoint.Weather>) {
+	async current(query: number | string | Coord | RequestQuery<Endpoint.Weather>): Promise<WeatherResponse> {
 		return this.request("weather", this._prepQuery(query));
 	}
 
@@ -51,7 +62,7 @@ export class ApiClient {
 	}
 
 	// Returns forecast for given query.
-	async forecast(query: number | string | Coord | RequestQuery<Endpoint.Forecast>) {
+	async forecast(query: number | string | Coord | RequestQuery<Endpoint.Forecast>): Promise<ForecastResponse> {
 		return this.request("forecast", this._prepQuery(query));
 	}
 
