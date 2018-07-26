@@ -184,7 +184,7 @@ export interface ForecastResponse extends ResponseBase {
 		sys: {
 			pod: string;
 		};
-	};
+	}[];
 }
 
 export type Response<T extends Endpoint> = T extends Endpoint.Forecast
