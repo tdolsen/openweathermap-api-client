@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/tdolsen/openweathermap-api-client/compare/v1.0.1...v1.0.2) (2018-07-26)
+
+
+### Bug Fixes
+
+* **types:** changes forecast response type to return list as array ([bfe3bcc](https://github.com/tdolsen/openweathermap-api-client/commit/bfe3bcc))
+
 ## [1.0.1](https://github.com/tdolsen/openweathermap-api-client/compare/v1.0.0...v1.0.1) (2018-07-26)
 
 
