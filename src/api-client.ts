@@ -8,12 +8,12 @@ import {
 	ForecastResponse,
 	Language,
 	Options,
-	RequestQuery,
+	Query,
 	Response,
 	Units,
 	WeatherResponse,
 } from "./interfaces";
-import { isEndpoint, isCoord, isRequestQuery, isCountryCode } from "./utils";
+import { isEndpoint, isCoord, isCountryCode, isQuery } from "./utils";
 import { ApiException } from "./api-exception";
 
 const DEFAULT_API_URL = "https://api.openweathermap.org/data/2.5";
@@ -32,6 +32,8 @@ export class ApiClient {
 	axios: AxiosInstance;
 	options: Options;
 
+	constructor(apiKey: string);
+	constructor(options: Options);
 	constructor(options: string | Options) {
 		if (typeof options === "string") options = { apiKey: options };
 
@@ -52,17 +54,17 @@ export class ApiClient {
 	}
 
 	// Returns the current weather for given query.
-	async current(query: number | string | Coord | RequestQuery<Endpoint.Weather>): Promise<WeatherResponse> {
+	async current(query: number | string | Coord | Query<Endpoint.Weather>): Promise<WeatherResponse> {
 		return this.request("weather", this._prepQuery(query));
 	}
 
 	// Alias to `.current()`.
-	async weather(query: number | string | Coord | RequestQuery<Endpoint.Weather>) {
+	async weather(query: number | string | Coord | Query<Endpoint.Weather>) {
 		return this.current(query);
 	}
 
 	// Returns forecast for given query.
-	async forecast(query: number | string | Coord | RequestQuery<Endpoint.Forecast>): Promise<ForecastResponse> {
+	async forecast(query: number | string | Coord | Query<Endpoint.Forecast>): Promise<ForecastResponse> {
 		return this.request("forecast", this._prepQuery(query));
 	}
 
@@ -120,19 +122,19 @@ export class ApiClient {
 	}
 
 	// Returns weather or forecast for given `query`.
-	async request<T extends Endpoint>(query: RequestQuery<T | undefined>): Promise<Response<T>>;
-	async request<T extends Endpoint>(endpoint: T | undefined, query: RequestQuery<any>): Promise<Response<T>>;
+	async request<T extends Endpoint>(query: Query<T>): Promise<Response<T>>;
+	async request<T extends Endpoint>(endpoint: T | undefined, query: Query<any>): Promise<Response<T>>;
 	async request<T extends Endpoint>(
-		queryOrEndpoint: RequestQuery<T | undefined> | T | undefined,
-		maybeQuery?: RequestQuery<T | undefined>
+		queryOrEndpoint: Query<T> | T | undefined,
+		maybeQuery?: Query<T>
 	): Promise<Response<T>> {
-		const query: RequestQuery<T> | undefined = isRequestQuery(maybeQuery)
+		const query: Query<T> | undefined = isQuery(maybeQuery)
 			? maybeQuery
-			: isRequestQuery(queryOrEndpoint)
+			: isQuery(queryOrEndpoint)
 				? queryOrEndpoint
 				: undefined;
 
-		if (!isRequestQuery(query)) {
+		if (!isQuery(query)) {
 			throw new Error("A proper request query must be provided to in order to make a request.");
 		}
 
@@ -178,14 +180,14 @@ export class ApiClient {
 
 	// Preps `query` param for `.current()` and `.forecast()`, assuming `number`
 	// represents a city ID, `string` represents city name and `Coord` represents
-	// lat/lon coordiantes. If `query` is a valid `RequestQuery` object will use
+	// lat/lon coordiantes. If `query` is a valid `Query` object will use
 	// that. Throws an error if no valid type was identified.
-	protected _prepQuery(query: number | string | Coord | RequestQuery<Endpoint | undefined>) {
+	protected _prepQuery(query: number | string | Coord | Query<Endpoint>) {
 		if (typeof query === "number") query = { id: query };
 		else if (typeof query === "string") query = { q: query };
-		else if (isCoord(query) || isRequestQuery(query)) query = { ...query };
+		else if (isCoord(query) || isQuery(query)) query = { ...query };
 		else throw new Error("Invalid value passed as request query.");
 
-		return query as RequestQuery<Endpoint | undefined>;
+		return query as Query<Endpoint>;
 	}
 }

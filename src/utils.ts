@@ -2,15 +2,17 @@ import {
 	Coord,
 	CountryCode,
 	Endpoint,
-	RequestQuery,
-	QueryByCityId,
-	QueryByCityName,
-	QueryByCoordinates,
-	QueryByZip,
+	Query,
+	QueryCityId,
+	QueryCityName,
+	QueryCoordinates,
+	QueryZip,
 } from "./interfaces";
 
 export function isCoord(x: any): x is Coord {
-	return typeof x === "object" && "lat" in x && "lon" in x;
+	const { lat, lon, ...rest } = x;
+
+	return typeof lat === "number" && typeof lon === "number" && Object.keys(rest).length === 0;
 }
 
 export function isCountryCode(x: any): x is CountryCode {
@@ -29,22 +31,22 @@ export function isWeatherEndpoint(x: any): x is Endpoint.Weather {
 	return isEndpoint(x) && x === Endpoint.Weather;
 }
 
-export function isRequestQuery(x: any): x is RequestQuery<any> {
-	return isQueryByCityId(x) || isQueryByCityName(x) || isQueryByCoordinates(x) || isQueryByZip(x);
+export function isQuery(x: any): x is Query<any> {
+	return isQueryCityId(x) || isQueryCityName(x) || isQueryCoordinates(x) || isQueryZip(x);
 }
 
-export function isQueryByCityId(x: any): x is QueryByCityId {
+export function isQueryCityId(x: any): x is QueryCityId<any> {
 	return typeof x === "object" && "id" in x;
 }
 
-export function isQueryByCityName(x: any): x is QueryByCityName {
+export function isQueryCityName(x: any): x is QueryCityName<any> {
 	return typeof x === "object" && "q" in x;
 }
 
-export function isQueryByCoordinates(x: any): x is QueryByCoordinates {
-	return isCoord(x);
+export function isQueryCoordinates(x: any): x is QueryCoordinates<any> {
+	return typeof x === "object" && "lat" in x && "lon" in x;
 }
 
-export function isQueryByZip(x: any): x is QueryByZip {
+export function isQueryZip(x: any): x is QueryZip<any> {
 	return typeof x === "object" && "zip" in x;
 }
