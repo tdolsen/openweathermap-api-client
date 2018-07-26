@@ -19,9 +19,6 @@
 		"release": "semantic-release",
 		"travis-deploy-once": "travis-deploy-once"
 	},
-	"publishConfig": {
-		"tag": "next"
-	},
 	"config": {
 		"commitizen": {
 			"path": "@commitlint/prompt"
