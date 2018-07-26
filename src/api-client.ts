@@ -28,7 +28,7 @@ const DEFAULT_OPTIONS: NonNullable<Pick<Options, "apiUrl" | "endpoint" | "lang" 
 	units: DEFAULT_UNITS,
 };
 
-export class ApiClient {
+export class OwmApiClient {
 	axios: AxiosInstance;
 	options: Options;
 
