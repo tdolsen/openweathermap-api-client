@@ -1,6 +1,6 @@
 {
 	"name": "openweathermap-api-client",
-	"version": "1.0.2",
+	"version": "1.0.3",
 	"description": "Promise based API client for getting weather data and forecasts from openweathermap.org",
 	"author": "Torkild Dyvik Olsen",
 	"license": "MIT",

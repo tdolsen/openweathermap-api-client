@@ -1,3 +1,10 @@
+## [1.0.3](https://github.com/tdolsen/openweathermap-api-client/compare/v1.0.2...v1.0.3) (2018-07-26)
+
+
+### Bug Fixes
+
+* **api:** prefixes api client class name with owm ([df50325](https://github.com/tdolsen/openweathermap-api-client/commit/df50325))
+
 ## [1.0.2](https://github.com/tdolsen/openweathermap-api-client/compare/v1.0.1...v1.0.2) (2018-07-26)
 
 
