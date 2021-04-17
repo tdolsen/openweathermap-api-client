@@ -25,27 +25,27 @@
 		}
 	},
 	"dependencies": {
-		"axios": "^0.18.0",
-		"query-string": "^6.1.0"
+		"axios": "^0.21.1",
+		"query-string": "^7.0.0"
 	},
 	"devDependencies": {
-		"@commitlint/cli": "^7.0.0",
-		"@commitlint/config-conventional": "^7.0.1",
-		"@commitlint/prompt": "^7.0.0",
-		"@semantic-release/changelog": "^3.0.0",
-		"@semantic-release/git": "^7.0.1",
-		"@semantic-release/github": "^5.0.1",
-		"@semantic-release/npm": "^4.0.0",
-		"@types/query-string": "^6.1.0",
-		"commitizen": "^2.10.1",
-		"del": "^3.0.0",
-		"del-cli": "^1.1.0",
-		"husky": "^1.0.0-rc.13",
-		"lint-staged": "^7.2.0",
-		"pkg-ok": "^2.2.0",
-		"prettier": "^1.13.7",
-		"semantic-release": "^15.8.1",
-		"travis-deploy-once": "^5.0.1",
-		"typescript": "^2.9.2"
+		"@commitlint/cli": "^12.1.1",
+		"@commitlint/config-conventional": "^12.1.1",
+		"@commitlint/prompt": "^12.1.1",
+		"@semantic-release/changelog": "^5.0.1",
+		"@semantic-release/git": "^9.0.0",
+		"@semantic-release/github": "^7.2.1",
+		"@semantic-release/npm": "^7.1.1",
+		"@types/query-string": "^6.3.0",
+		"commitizen": "^4.2.3",
+		"del": "^6.0.0",
+		"del-cli": "^3.0.1",
+		"husky": "^6.0.0",
+		"lint-staged": "^10.5.4",
+		"pkg-ok": "^2.3.1",
+		"prettier": "^2.2.1",
+		"semantic-release": "^17.4.2",
+		"travis-deploy-once": "^5.0.11",
+		"typescript": "^4.2.4"
 	}
 }
